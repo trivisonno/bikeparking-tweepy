@@ -180,7 +180,7 @@ def panel():
             print(feature)
 
     # Render the data in the jinja template and display to user
-    return render_template('panel.html', results=results)
+    return render_template('panel.html', results=results, apikey=apikey)
 
 
 if __name__ == "__main__":

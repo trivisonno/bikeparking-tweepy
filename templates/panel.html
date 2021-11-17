@@ -49,8 +49,7 @@
   <td><a target="_blank" href="https://www.openstreetmap.org/node/{{ result['id'] }}/">{{ result['id'] }}</a></td>
   <td{%if result['properties']['bicycle_parking']=="stands" or result['properties']['bicycle_parking']=="bollard" or result['properties']['bicycle_parking']=="lockers"%} style="background-color:#9be681"{%endif%}>{{ result['properties']['bicycle_parking'] }}</td>
   <td>{{ result['properties']['capacity'] }}{% if result['properties']['capacity'] is defined %}{% set totalCap.value = totalCap.value + result['properties']['capacity'] | int %}{% endif %}</td>
-  <!--<td><a target="_blank" href='https://maps.googleapis.com/maps/api/staticmap?&maptype=hybrid&size=507x285&zoom=19&markers=label:P|{{ result['geometry']['coordinates'][1] }},{{ result['geometry']['coordinates'][0] }}&key=AIzaSyBYLQSMIWnX8FUYnYaRkAFr1uaYcUgr6w0'>imgsrc</a></td>-->
-  <td><a target="_blank" href='https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=600&height=335&center=lonlat:{{ result['geometry']['coordinates'][0] }},{{ result['geometry']['coordinates'][1] }}&marker=lonlat:{{ result['geometry']['coordinates'][0] }},{{ result['geometry']['coordinates'][1] }};color:%23ff0000;size:medium&zoom=16&apiKey=b82fd0fe76fd4abc94de796c6a23f177'>imgsrc</a></td>
+  <td><a target="_blank" href='https://maps.geoapify.com/v1/staticmap?style=osm-carto&width=600&height=335&center=lonlat:{{ result['geometry']['coordinates'][0] }},{{ result['geometry']['coordinates'][1] }}&marker=lonlat:{{ result['geometry']['coordinates'][0] }},{{ result['geometry']['coordinates'][1] }};color:%23ff0000;size:medium&zoom=16&apiKey={{ apikey }}'>imgsrc</a></td>
   <td>{% if result['properties']['capacity'] %}Secure parking added for {{result['properties']['capacity']}} bicycle{% if result['properties']['capacity']| int >1%}s{%endif%}. https://www.openstreetmap.org/node/{{ result['id'] }}{%endif%}</td>
 
 </tr>
