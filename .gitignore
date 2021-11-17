@@ -1,0 +1,5 @@
+zappa_settings.json
+secrets.py
+.DS_Store
+*.zip
+*.gz
