@@ -33,7 +33,7 @@ apiTwitter = tweepy.API(auth)
 allowableBikeParkingTypes = ['stands', 'bollard', 'lockers']
 
 # App will search for nearby POIs with only these keys
-typesNearby = ['building', 'amenity', 'shop', 'leisure', 'name']
+typesNearby = ['building', 'amenity', 'shop', 'leisure']
 
 
 def getStaticMap(lat, lng):
@@ -106,7 +106,7 @@ def main(bike_data):
             places = getNearbyPlacesOSM(str(lat),str(lng)) #
 
             if len(places) > 0:
-                tweet += " near " + (", ".join(places[:-2] + [" and ".join(places[-2:])]))
+                tweet += " near " + (", ".join(places[:-2] + [", and ".join(places[-2:])]))
             tweet += "."
             if len(tweet) > 256:
                 tweet = tweet[0:252] + "..."
@@ -124,7 +124,7 @@ def main(bike_data):
             tweetId = apiTwitter.update_status(tweetStatus, media_ids=[media.media_id])
 
             # Add the tweeted item to the TinyDb file
-            db.upsert({'nodeId': bike_data['id'], 'tweet': tweetStatus, 'tweetId': json.dumps(tweetId)['id']}, Node.nodeId == bike_data['id'])
+            db.upsert({'nodeId': bike_data['id'], 'tweet': tweetStatus, 'tweetId': tweetId._json['id']}, Node.nodeId == bike_data['id'])
 
 
 def checkBikeParking():
@@ -147,6 +147,7 @@ def checkBikeParking():
         if int(item['id'])>afterNodeNumber and boundary.contains(itemPt):
             if 'bicycle_parking' in item['properties'].keys():
                 main(item)
+
 
     # Complete with uploading the TinyDb file to our S3 bucket
     with open('/tmp/db.json', "rb") as f:
