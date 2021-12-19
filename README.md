@@ -12,7 +12,7 @@ A twitter bot app that searches for bicycle parking added to OpenStreetMap. Reli
 * Git clone the repo to your local system (git clone https://github.com/trivisonno/bikeparking-tweepy.git)
 * Install all python dependencies using pip (pip install zappa flask shapely overpass boto3 tinydb)
 * Create a zappa project with defaults (zappa init)
-* Rename the secrets.sample.py file to secrets.py, and add your Geoapify and Twitter API keys and access tokens
+* Rename the foo/secrets.sample.py file to foo/secrets.py, and add your Geoapify and Twitter API keys and access tokens
 * Update line 15 of the app.py with the node ID from which you wish to start tracking new bike parking items. If you set it to 0, then the app will tweet out info for every single bicycle parking item it finds. You might wish to only tweet about bicycle parking added after your launched your app, so you should update this with an appropriate nodeId. If you leave the default value (9256651107), that should only add anything after about November 17, 2021. (TODO: Update this setting code.)
 * If you wish, adjust the radius (meters) on line 16 for the nearby POI search. (Default: 50)
 * Create an S3 bucket, and update line 19 of the app.py file with the bucket name

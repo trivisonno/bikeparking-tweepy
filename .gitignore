@@ -1,3 +1,4 @@
+db.json
 zappa_settings.json
 secrets.py
 .DS_Store

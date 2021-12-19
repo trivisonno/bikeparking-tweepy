@@ -91,11 +91,11 @@ def main(bike_data):
 
         #Check if already in the database
         if len(db.search(Node.nodeId == bike_data['id'])) == 0:
-
+            print(bike_data)
             # Build the tweet text
             tweet = ''
 
-            if bike_data['properties']['capacity']:
+            if 'capacity' in bike_data['properties'].keys():
                 if int(bike_data['properties']['capacity']) == 1:
                     tweet += 'Secure parking added for '+bike_data['properties']['capacity']+" bicycle"
                 else:
@@ -139,9 +139,11 @@ def checkBikeParking():
     # Query OSM for all bicycle parking within the bounding box
     response = api.get('node["amenity"="bicycle_parking"]'+boundary_bbox+';out;', responseformat="geojson")
 
+    unique = { each['id'] : each for each in response['features'] }.values()
+    #print(unique)
 
 
-    for item in response['features']:
+    for item in unique:
         itemPt = Point(item['geometry']['coordinates'])
         # Check if the bicycle parking item is newer than the setpoint and if it's within the boundary polygon
         if int(item['id'])>afterNodeNumber and boundary.contains(itemPt):
@@ -160,6 +162,65 @@ def home():
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
 
+# A geojson function to see a table of all bicycle parking
+@app.route('/geojson-missing')
+def geojson_missing():
+    # Open the boundary geojson file, and generate a Shapely polygon and bounding box for the OSM POI search
+    with open('boundary.geojson', 'r') as f:
+        boundary_data = json.loads(f.read())['features'][0]
+    boundary = Polygon(boundary_data['geometry']['coordinates'][0])
+    boundary_bbox = '(' + str(boundary.bounds[1]) + ',' + str(boundary.bounds[0]) + ',' + str(boundary.bounds[3]) + ',' + str(boundary.bounds[2]) + ')'
+
+    api = overpass.API()
+    response = api.get('node["amenity"="bicycle_parking"]'+boundary_bbox+';', responseformat="geojson")
+    unique = { each['id'] : each for each in response['features'] }.values()
+
+    # An array holding all of the bicycle parking results
+    results = []
+    for item in unique:
+        itemPt = Point(item['geometry']['coordinates'])
+        # Check if the bicycle parking item is newer than the setpoint and if it's within the boundary polygon
+        if boundary.contains(itemPt) and (('capacity' not in item['properties'].keys()) or ('bicycle_parking' not in item['properties'].keys())):
+            try:
+                results.append(item)
+            except:
+                print(item)
+
+    # Render the data in the jinja template and display to user
+    return json.dumps({"type": "FeatureCollection","features": results}), 200, {'ContentType':'application/json'}
+
+
+
+# A geojson function to see a table of all bicycle parking
+@app.route('/geojson')
+def geojson():
+    # Open the boundary geojson file, and generate a Shapely polygon and bounding box for the OSM POI search
+    with open('boundary.geojson', 'r') as f:
+        boundary_data = json.loads(f.read())['features'][0]
+    boundary = Polygon(boundary_data['geometry']['coordinates'][0])
+    boundary_bbox = '(' + str(boundary.bounds[1]) + ',' + str(boundary.bounds[0]) + ',' + str(boundary.bounds[3]) + ',' + str(boundary.bounds[2]) + ')'
+
+    api = overpass.API()
+    response = api.get('node["amenity"="bicycle_parking"]'+boundary_bbox+';', responseformat="geojson")
+    unique = { each['id'] : each for each in response['features'] }.values()
+
+    # An array holding all of the bicycle parking results
+    results = []
+    for item in unique:
+        itemPt = Point(item['geometry']['coordinates'])
+        # Check if the bicycle parking item is newer than the setpoint and if it's within the boundary polygon
+        if boundary.contains(itemPt):
+            try:
+                results.append(item)
+            except:
+                print(item)
+
+    # Render the data in the jinja template and display to user
+    return json.dumps({"type": "FeatureCollection","features": results}), 200, {'ContentType':'application/json'}
+
+
+
+
 # A control panel function to see a table of all bicycle parking
 @app.route('/panel')
 def panel():
@@ -171,18 +232,21 @@ def panel():
 
     api = overpass.API()
     response = api.get('node["amenity"="bicycle_parking"]'+boundary_bbox+';', responseformat="geojson")
+    unique = { each['id'] : each for each in response['features'] }.values()
 
     # An array holding all of the bicycle parking results
     results = []
-    for feature in response['features']:
-        try:
-            results.append(feature)
-        except:
-            print(feature)
+    for item in unique:
+        itemPt = Point(item['geometry']['coordinates'])
+        # Check if the bicycle parking item is newer than the setpoint and if it's within the boundary polygon
+        if boundary.contains(itemPt):
+            try:
+                results.append(item)
+            except:
+                print(item)
 
     # Render the data in the jinja template and display to user
     return render_template('panel.html', results=results, apikey=apikey)
-
 
 if __name__ == "__main__":
     checkBikeParking()
