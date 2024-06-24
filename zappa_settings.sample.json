@@ -8,7 +8,7 @@
         "s3_bucket": "<ZAPPA_BUCKET>",
         "slim_handler": true,
         "include": [
-            "secrets.py", "boundary.geojson"
+            "foo/secrets.py", "boundary.geojson"
         ],
         "keep_warm": false,
         "timeout_seconds": 600,

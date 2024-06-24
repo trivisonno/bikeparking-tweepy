@@ -34,6 +34,7 @@ client = tweepy.Client(consumer_key=consumer_key,
             access_token_secret=access_token_secret)
 apiTwitter = tweepy.API(auth)
 
+
 # App will only tweet about these bike parking type values
 # https://wiki.openstreetmap.org/wiki/Key:bicycle_parking
 allowableBikeParkingTypes = ['stands', 'bollard', 'lockers']
@@ -136,10 +137,11 @@ def main(bike_data):
             # Upload the image and alt-text to twitter, and then tweet the status
             media = apiTwitter.media_upload("/tmp/"+str(bike_data['geometry']['coordinates'][1])+','+str(bike_data['geometry']['coordinates'][0])+".jpg")
             mediaAltText = apiTwitter.create_media_metadata(media.media_id, altText)
-            tweetId = client.create_tweet(tweetStatus, media_ids=[media.media_id])
+            tweetId = client.create_tweet(text=tweetStatus, media_ids=[media.media_id])
+            # print(tweetId.data)
 
             # Add the tweeted item to the TinyDb file
-            db.upsert({'nodeId': bike_data['id'], 'tweet': tweetStatus, 'tweetId': tweetId._json['id']}, Node.nodeId == bike_data['id'])
+            db.upsert({'nodeId': bike_data['id'], 'tweet': tweetStatus, 'tweetId': tweetId.data['id']}, Node.nodeId == bike_data['id'])
             with open('/tmp/db.json', "rb") as f:
                 s3.upload_fileobj(f, s3bucket, 'db.json')
             return False# only tweet once every time the script runs, to space out the info

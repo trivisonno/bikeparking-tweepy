@@ -4,3 +4,5 @@ secrets.py
 .DS_Store
 *.zip
 *.gz
+.*
+*.lock
